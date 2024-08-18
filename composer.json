@@ -1,0 +1,21 @@
+{
+    "name": "refkinscallv/cookie",
+    "description": "Cookies Library for PHP",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "RF\\Cookie\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Refkinscallv",
+            "email": "refkinscallv@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "refkinscallv/crypto": "^1.0"
+    }
+}
