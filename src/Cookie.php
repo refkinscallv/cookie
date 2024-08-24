@@ -52,6 +52,8 @@
 
             if ($this->cookieEncrypt) {
                 $this->crypto = new Crypto($this->cookieEncrypt);
+            } else {
+                $this->crypto = null;
             }
         }
 
