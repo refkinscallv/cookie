@@ -1,6 +1,7 @@
 {
     "name": "refkinscallv/cookie",
     "description": "Cookies Library for PHP",
+    "version": "1.0.5",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -14,8 +15,5 @@
             "email": "refkinscallv@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
-    "require": {
-        "refkinscallv/crypto": "^1.0"
-    }
+    "minimum-stability": "stable"
 }
