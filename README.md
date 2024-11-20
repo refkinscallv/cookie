@@ -1,99 +1,241 @@
-# refkinscallv/cookie
+Here's how you can modify the documentation to include the installation guide and a sample `.env` file, while keeping the existing content intact.
 
-`refkinscallv/cookie` is a PHP package for managing cookies with optional encryption support. It integrates with the `refkinscallv/crypto` package to provide encrypted cookie handling.
+---
+
+# Cookie Library with Encryption Support
+
+The `Cookie` class provides an advanced solution for managing cookies, with optional encryption support using the `Crypto` class. This library allows you to securely store and retrieve cookie data in both encrypted and plain formats.
+
+---
+
+## Features
+
+- **Encrypted Cookies**: Use the `Crypto` library for secure cookie encryption and decryption.
+- **Key-Value Storage**: Manage cookies as associative arrays for ease of use.
+- **Customizable**: Configure expiration time, domain, path, and secure options.
+- **Easy Integration**: Works seamlessly with both encrypted and non-encrypted cookie management.
+
+---
 
 ## Installation
 
-To install the package, use Composer:
+1. **Install the Package via Composer**
 
-```bash
-composer require refkinscallv/cookie
-```
+   To install the `refkinscallv/cookie` package, run the following command:
 
-## Configuration
+   ```bash
+   composer require refkinscallv/cookie
+   ```
 
-Before using the `Cookie` class, ensure you have the `refkinscallv/crypto` package installed as it provides the encryption functionality. For details on configuring `cookieEncrypt`, refer to the [crypto documentation](https://github.com/refkinscallv/crypto).
+   This command will download and install the library along with its dependencies.
+
+2. **Include the Composer Autoloader**
+
+   Make sure to include the Composer autoloader at the top of your PHP scripts to automatically load the classes:
+
+   ```php
+   require_once 'vendor/autoload.php';
+   ```
+
+3. **Environment Configuration**
+
+   Make sure that your environment variables are properly configured for cookie management. You can do this by creating a `.env` file in the root directory of your project (if not already present) with the following contents:
+
+   **Sample `.env` File**:
+
+   ```env
+   COOKIE_NAME=web_cookie
+   COOKIE_EXPIRES=24
+   COOKIE_PATH=/
+   COOKIE_SECURE=false
+   ```
+
+   This file defines:
+   - `COOKIE_NAME`: The name of the cookie.
+   - `COOKIE_EXPIRES`: The cookie expiration time in hours (default is 24 hours).
+   - `COOKIE_PATH`: The path on the server where the cookie is available.
+   - `COOKIE_SECURE`: Whether the cookie should be marked as secure (use HTTPS only). Set to `false` by default.
+
+4. **Using the Library**
+
+   After installing the package and configuring your environment, you can now begin using the `Cookie` class in your project.
+
+---
 
 ## Usage
 
-### Basic Example
+### Basic Setup
+
+#### Without Encryption
 
 ```php
-<?php
+use RF\Cookie\Cookie;
 
-    use RF\Cookie\Cookie;
+// Initialize Cookie class without encryption
+$cookie = new Cookie();
 
-    require "../vendor/autoload.php";
+// Set a cookie
+$cookie->set('user', 'John Doe');
 
-    $cookie = new Cookie([
-        'cookieName' => 'myCookie',
-        'cookieExpires' => 24, // Cookie expiration in hours
-        'cookiePath' => '/',
-        'cookieDomain' => $_SERVER['SERVER_NAME'],
-        'cookieSecure' => false, // Set to true if using HTTPS
-        'cookieHttpOnly' => true,
-        /* Optional */
-        // 'cookieEncrypt' => [
-        //     "encryptKey" => "your-secret-key",
-        //     "encryptCipher" => "AES-256-CBC",
-        //     "encryptStoreMethod" => "local",
-        //     "encryptFile" => "/path/to/encrypt.txt"
-        // ]
-    ]);
-    
-    // Set a cookie value
-    $cookie->set('key', 'value');
-    
-    // Get a cookie value
-    $value = $cookie->get('key');
-    
-    // Retrieve all cookie data
-    $allData = $cookie->all();
-    
-    // Unset a cookie value
-    $cookie->unset('key');
-    
-    // Destroy the cookie
-    $cookie->destroy();
+// Get a cookie value
+echo $cookie->get('user'); // Outputs: John Doe
+
+// Check if a cookie exists
+if ($cookie->has('user')) {
+    echo 'User cookie is set.';
+}
+
+// Unset a cookie
+$cookie->unset('user');
+
+// Destroy all cookies
+$cookie->destroy();
 ```
 
-### Class Methods
+#### With Encryption
 
-#### `__construct(array $args = [])`
+```php
+use RF\Crypto\Crypto;
+use RF\Cookie\Cookie;
 
-Initializes the `Cookie` instance with configuration options. 
+// Instantiate the Crypto class
+$crypto = new Crypto([
+    "encryptKey" => "your-secret-key",
+    "encryptCipher" => "AES-256-CBC",
+    "encryptStoreMethod" => "local",
+    "encryptFile" => "/path/to/encrypt.txt"
+]);
 
-- `cookieName` (string, required): The name of the cookie.
-- `cookieExpires` (int, optional): Expiration time in hours (default: 24).
-- `cookiePath` (string, optional): Path on the server where the cookie will be available (default: `/`).
-- `cookieDomain` (string, optional): Domain of the cookie (default: current server name).
-- `cookieSecure` (bool, optional): Indicates if the cookie should only be sent over HTTPS (default: false).
-- `cookieHttpOnly` (bool, optional): Indicates if the cookie is accessible only through the HTTP protocol (default: true).
-- `cookieEncrypt` (array, optional): Encryption settings for the cookie data. [crypto documentation](https://github.com/refkinscallv/crypto).
+// Initialize Cookie class with encryption
+$cookie = new Cookie($crypto);
 
-#### `all(): array`
+// Set an encrypted cookie
+$cookie->set('user', 'John Doe');
 
-Retrieves all encrypted cookie data as an array.
+// Get an encrypted cookie value
+echo $cookie->get('user'); // Outputs: John Doe
 
-#### `get(string $value)`
+// Check if a cookie exists
+if ($cookie->has('user')) {
+    echo 'User cookie is set.';
+}
 
-Retrieves a specific value from the decrypted cookie data.
+// Unset an encrypted cookie
+$cookie->unset('user');
 
-#### `set($key, $value = null): bool`
+// Destroy all encrypted cookies
+$cookie->destroy();
+```
 
-Sets encrypted cookie data. Accepts an associative array or a single key-value pair.
+---
 
-#### `unset($key = null): bool`
+## Configuration
 
-Unsets encrypted cookie data. Accepts a single key or an array of keys.
+### Constructor Parameters
 
-#### `destroy()`
+```php
+public function __construct(mixed $db = null)
+```
 
-Destroys the cookie by setting its expiration time to the past.
+- **`$db`** *(mixed)*: Pass a `Crypto` instance to enable encryption. Use `null` for plain cookie management.
+
+### Environment Variables
+
+| Variable         | Description                                  | Default Value      |
+|-------------------|----------------------------------------------|--------------------|
+| `COOKIE_NAME`     | The name of the cookie.                     | `web_cookie`       |
+| `COOKIE_EXPIRES`  | Expiration time in hours.                   | `24` (1 day)       |
+| `COOKIE_PATH`     | The path on the server where the cookie is available. | `/` |
+| `COOKIE_SECURE`   | Use secure cookies (HTTPS only).             | `false`            |
+
+---
+
+## Methods
+
+### `all()`
+Retrieve all cookie data as an associative array.
+
+```php
+$cookies = $cookie->all();
+```
+
+### `get(string $key)`
+Retrieve a specific cookie value.
+
+```php
+$value = $cookie->get('key');
+```
+
+### `has(string $key)`
+Check if a cookie key exists.
+
+```php
+$exists = $cookie->has('key');
+```
+
+### `set(string|array $key, mixed $value = null)`
+Set a cookie value. Supports setting multiple key-value pairs.
+
+```php
+$cookie->set('key', 'value');
+$cookie->set(['key1' => 'value1', 'key2' => 'value2']);
+```
+
+### `unset(string|array $key)`
+Remove a specific cookie or multiple cookies.
+
+```php
+$cookie->unset('key');
+$cookie->unset(['key1', 'key2']);
+```
+
+### `destroy()`
+Remove all cookies.
+
+```php
+$cookie->destroy();
+```
+
+---
 
 ## Notes
 
-- Ensure you handle encryption keys and settings securely.
-- This package requires the `refkinscallv/crypto` package for encryption functionality. Refer to its documentation for configuration details.
+- **Encryption Dependency**: To enable encryption, ensure the `Crypto` class is correctly configured and passed to the `Cookie` constructor.
+- **Headers Sent**: Ensure that cookies are set before any output is sent to the browser to avoid `headers already sent` errors.
 
-For further assistance, please refer to the [crypto documentation](https://github.com/refkinscallv/crypto) or open an issue on the package's repository.
+---
+
+## Example with Database Encryption
+
+To use database-based encryption with cookies, you can leverage the [Crypto Library](https://github.com/refkinscallv/crypto). This library supports multiple storage methods, including databases.
+
+### Example
+
+```php
+use RF\Crypto\Crypto;
+use RF\Cookie\Cookie;
+
+// Configure Crypto with database storage
+$crypto = new Crypto([
+    "encryptKey" => "your-secret-key",
+    "encryptCipher" => "AES-256-CBC",
+    "encryptStoreMethod" => "database",
+    "encryptDBHandler" => function($data, $mode) {
+        // Database logic for storing and retrieving encrypted data
+        if ($mode === 'save') {
+            // Save $data to the database
+        } elseif ($mode === 'load') {
+            // Retrieve and return encrypted data from the database
+        }
+    }
+]);
+
+// Initialize Cookie class with database encryption
+$cookie = new Cookie($crypto);
+
+// Set and retrieve an encrypted cookie
+$cookie->set('user', 'Encrypted User');
+echo $cookie->get('user'); // Outputs: Encrypted User
+```
+
+For a full tutorial and detailed documentation on configuring the Crypto library, visit the [Crypto Library GitHub Repository](https://github.com/refkinscallv/crypto).
